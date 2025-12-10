@@ -1,9 +1,11 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-documentation-current/page/Automated_Device_Enrollment_for_Computers.html
+
 terraform {
   required_version = ">= 1.14.1"
   required_providers {
     jamfpro = {
       source  = "deploymenttheory/jamfpro"
-      version = "0.30.0"
+      version = "0.27.0"
     }
   }
 }

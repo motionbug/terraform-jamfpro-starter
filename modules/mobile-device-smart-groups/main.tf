@@ -1,3 +1,5 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-documentation-current/page/Smart_Groups.html
+
 terraform {
   required_version = ">= 1.14.1"
   required_providers {

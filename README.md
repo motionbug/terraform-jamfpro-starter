@@ -1,16 +1,21 @@
 # Jamf Pro Terraform Starter
 
-A comprehensive, production-ready Terraform configuration for managing a complete Jamf Pro instance with an opinionated configuration. This project demonstrates what the authors consider best practice for Infrastructure as Code (IaC) with Jamf Pro. It can serve as a foundation for your own deployment.
+A comprehensive, almost production-ready Terraform configuration for managing a complete Jamf Pro instance with an opinionated set of examples. This project demonstrates what the authors consider best practice for Infrastructure as Code (IaC) with Jamf Pro. It can serve as inspiration for your own deployment.
 
 ## 🎯 Overview
 
 This starter project provides a fully-functional Jamf Pro configuration using Terraform, covering:
 
 - **Core Settings**: Categories, enrollment, inventory collection, LAPS, ADE & VPP token support and more
+- **Device Enrollment**: Automated Device Enrollment and [Access Management](https://support.apple.com/en-gb/guide/apple-business-manager/axm53xk34bq/web) integration with Apple Business/School Manager
 - **Computer Management**: PreStages, smart groups, configuration profiles, policies, and packages
 - **Mobile Device Management**: PreStages, smart groups, configuration profiles, and apps
 - **Security & Compliance**: CIS benchmarks and Jamf Pro Blueprints
-- **App Distribution**: App Installers and Mobile Device Apps (VPP)
+- **App Distribution**: App Installers, Mac App Store Apps (VPP) and Mobile Device Apps (VPP)
+- **Platform SSO**: [Entra ID](https://learn.jamf.com/en-US/bundle/technical-articles/page/Platform_SSO_for_Microsoft_Entra_ID.html) example configuration for computers (PreStage, Company Portal and configuration profile)
+- **Enterprise SSO**: [Entra ID](https://learn.microsoft.com/en-us/intune/intune-service/configuration/use-enterprise-sso-plug-in-ios-ipados-with-intune?tabs=prereq-jamf-pro%2Ccreate-profile-jamf-pro) example configuration for mobile devices (Microsoft Authenticator and configuration profile)
+
+> The Entra ID SSO examples are provided because they do not require bespoke customer-specific tenant/domain configuration details. Other Identity Provider configurations do. As such, they are not included at this time due to this additional complexity (but it is indeed possible to implement them with Terraform following similar techniques used in this project!).
 
 ## 📋 Prerequisites
 
@@ -163,7 +168,9 @@ terraform-jamfpro-starter/
 │
 └── modules/                         # Modular organization
     ├── settings/                    # Core Jamf Pro settings
+    │   ├── buildings.tf
     │   ├── categories.tf
+    │   ├── departments.tf
     │   ├── automated-device-enrollment.tf
     │   ├── volume-purchasing-locations.tf
     │   ├── computer-checkin.tf
@@ -178,6 +185,7 @@ terraform-jamfpro-starter/
     ├── packages/                    # Packages (.pkg files)
     ├── policies/                    # Policies
     ├── app-installers/              # App Installers (Jamf App Catalogue)
+    ├── mac-apps/                    # Mac App Store apps (VPP)
     │
     ├── mobile-device-prestages/     # Mobile device PreStage enrollments
     ├── mobile-device-smart-groups/  # Mobile device smart groups
@@ -238,11 +246,11 @@ Each module contains resource files that can be customized:
    resource "jamfpro_policy" "install_microsoft_teams" {
      name     = "Install Microsoft Teams"
      enabled  = true
-     category_id = var.category_ids["Applications (Managed by Terraform)"]
+     category_id = var.category_ids["applications"]
      
      scope {
        computer_group_ids = [
-         var.computer_smart_group_model_ids["Laptops"]
+         var.computer_smart_group_ids["laptops"]
        ]
      }
      
@@ -257,14 +265,14 @@ Each module contains resource files that can be customized:
 1. Create a new file in `modules/computer-smart-groups/`:
 
    ```hcl
-   # modules/computer-smart-groups/os-version-sonoma.tf
-   resource "jamfpro_smart_computer_group" "sonoma" {
-     name = "macOS Sonoma (Managed by Terraform)"
+   # modules/computer-smart-groups/filevault-enabled.tf
+   resource "jamfpro_smart_computer_group" "filevault_enabled" {
+     name = "FileVault 2 Is Enabled (Managed by Terraform)"
      criteria {
-       name        = "Operating System Version"
+       name        = "FileVault 2 Enabled"
        priority    = 0
-       search_type = "like"
-       value       = "14."
+       search_type = "is"
+       value       = "Enabled"
      }
    }
    ```
@@ -273,28 +281,27 @@ Each module contains resource files that can be customized:
 
    ```hcl
    # modules/computer-smart-groups/outputs.tf
-   output "model_ids" {
+   output "group_ids" {
      description = "Map of smart group keys to their Jamf Pro IDs"
      value = merge(
-       # Existing model groups
+       # Existing groups:
        { for k, g in jamfpro_smart_computer_group.model : k => g.id },
-       # Add your new group
-       {
-         sonoma = jamfpro_smart_computer_group.sonoma.id
-       }
+       ...
+       # Add your new group here:
+       { filevault_enabled = jamfpro_smart_computer_group.filevault_enabled.id }
      )
    }
    ```
 
-3. Use in other modules via `var.computer_smart_group_model_ids["sonoma"]`
+3. Use in other modules via `var.computer_smart_group_model_ids["filevault_enabled"]`
 
    ```hcl
-   # modules/policies/deploy-to-sonoma.tf
-   resource "jamfpro_policy" "deploy_to_sonoma" {
-     name = "Deploy App to Sonoma Macs"
+   # modules/policies/deploy-to-filevault.tf
+   resource "jamfpro_policy" "deploy_to_filevault" {
+     name = "Deploy Script to FileVault Enabled Macs"
      scope {
        computer_group_ids = [
-         var.computer_smart_group_model_ids["sonoma"]
+         var.computer_smart_group_ids["filevault_enabled"]
        ]
      }
    }
@@ -448,8 +455,8 @@ resource "jamfpro_policy" "install_microsoft_teams" {
   name = "Install Microsoft Teams (Managed by Terraform)"
 }
 
-resource "jamfpro_smart_computer_group" "macos_sonoma" {
-  name = "macOS Sonoma (Managed by Terraform)"
+resource "jamfpro_smart_computer_group" "filevault_enabled" {
+  name = "FileVault Is Enabled (Managed by Terraform)"
 }
 
 # ❌ Avoid
@@ -457,8 +464,8 @@ resource "jamfpro_policy" "InstallMicrosoftTeams" {
   name = "Install Microsoft Teams"
 }
 
-resource "jamfpro_smart_computer_group" "macOS-sonoma" {
-  name = "macOS Sonoma"
+resource "jamfpro_smart_computer_group" "FileVault-enabled" {
+  name = "FileVault Is Enabled"
 }
 ```
 
@@ -497,7 +504,9 @@ variable "jamfpro_instance_fqdn" {
 
 output "computer_smart_group_ids" {
   description = "Map of computer smart group keys to their Jamf Pro IDs"
-  value       = { for k, g in jamfpro_smart_computer_group.model : k => g.id }
+  value       = merge(
+    { for k, g in jamfpro_smart_computer_group.model : k => g.id }
+  )
 }
 
 # ❌ Avoid
@@ -507,7 +516,9 @@ variable "jamfProInstanceFQDN" {
 }
 
 output "csg_ids" {
-  value = { for k, g in jamfpro_smart_computer_group.model : k => g.id }
+  value = merge(
+    { for k, g in jamfpro_smart_computer_group.model : k => g.id }
+  )
 }
 ```
 

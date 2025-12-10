@@ -1,5 +1,12 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-documentation-current/page/Apps_Purchased_in_Volume.html
+
 variable "category_ids" {
   description = "Map of category IDs"
+  type        = map(string)
+}
+
+variable "department_ids" {
+  description = "Map of department IDs"
   type        = map(string)
 }
 

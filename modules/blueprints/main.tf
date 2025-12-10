@@ -1,3 +1,5 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-blueprints-configuration-guide/page/Jamf_Pro_Blueprints_Configuration_Guide.html
+
 terraform {
   required_version = ">= 1.14.1"
   required_providers {
@@ -7,19 +9,19 @@ terraform {
     }
     jamfpro = {
       source  = "deploymenttheory/jamfpro"
-      version = "0.30.0"
+      version = "0.27.0"
     }
   }
 }
 
-data "jamfpro_group" "computer_smart_group_models" {
-  for_each         = var.computer_smart_group_model_ids
+data "jamfpro_group" "computer_smart_groups" {
+  for_each         = var.computer_smart_group_ids
   group_jamfpro_id = each.value
   group_type       = "COMPUTER"
 }
 
-data "jamfpro_group" "mobile_device_smart_group_models" {
-  for_each         = var.mobile_device_smart_group_model_ids
+data "jamfpro_group" "mobile_device_smart_groups" {
+  for_each         = var.mobile_device_smart_group_ids
   group_jamfpro_id = each.value
   group_type       = "MOBILE"
 }

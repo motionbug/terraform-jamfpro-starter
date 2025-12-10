@@ -1,8 +1,10 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-blueprints-configuration-guide/page/Jamf_Pro_Blueprints_Configuration_Guide.html
+
 resource "jamfplatform_blueprints_blueprint" "passcode_policy" {
   name        = "Passcode Policy"
   description = "Managed by Terraform"
 
-  device_groups = [data.jamfpro_group.mobile_device_smart_group_models["iPhones"].group_platform_id]
+  device_groups = [data.jamfpro_group.mobile_device_smart_groups["iphones"].group_platform_id]
 
   passcode_policy {
     change_at_next_auth              = true

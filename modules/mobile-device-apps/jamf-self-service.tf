@@ -1,3 +1,5 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-documentation-current/page/Apps_Purchased_in_Volume.html
+
 locals {
   jamf_self_service_app_store_url = "https://apps.apple.com/gb/app/jamf-self-service/id718509958"
   jamf_self_service_vpp_status = {
@@ -29,7 +31,7 @@ resource "jamfpro_mobile_device_application" "jamf_self_service" {
   bundle_id                              = each.value.bundle_id
   version                                = each.value.version
   internal_app                           = false
-  category_id                            = var.category_ids["Applications (Managed by Terraform)"]
+  category_id                            = var.category_ids["applications"]
   site_id                                = -1
   itunes_store_url                       = each.value.track_view_url
   external_url                           = each.value.track_view_url

@@ -1,14 +1,11 @@
-output "os_version_ids" {
-  description = "Map of smart group key -> jamf smart group id (OS groups)"
-  value       = { for k, g in jamfpro_smart_computer_group.os_version : k => g.id }
-}
+# https://learn.jamf.com/en-US/bundle/jamf-pro-documentation-current/page/Smart_Groups.html
 
-output "architecture_type_ids" {
-  description = "Map of smart group key -> jamf smart group id (Architecture type groups)"
-  value       = { for k, g in jamfpro_smart_computer_group.architecture : k => g.id }
-}
-
-output "model_ids" {
-  description = "Map of smart group key -> jamf smart group id (Model groups)"
-  value       = { for k, g in jamfpro_smart_computer_group.model : k => g.id }
+output "group_ids" {
+  description = "Map of smart group key -> jamf smart group id (Custom groups)"
+  value = merge(
+    { all_managed = jamfpro_smart_computer_group.all_managed.id },
+    { for k, g in jamfpro_smart_computer_group.os_version : k => g.id },
+    { for k, g in jamfpro_smart_computer_group.architecture : k => g.id },
+    { for k, g in jamfpro_smart_computer_group.model : k => g.id }
+  )
 }

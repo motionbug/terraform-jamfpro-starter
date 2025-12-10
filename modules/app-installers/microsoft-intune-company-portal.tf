@@ -1,12 +1,14 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-documentation-current/page/App_Installers.html
+
 resource "jamfpro_app_installer" "microsoft_intune_company_portal" {
   app_title_name                     = "Microsoft Intune Company Portal"
   name                               = "Microsoft Intune Company Portal"
   enabled                            = true
   deployment_type                    = "INSTALL_AUTOMATICALLY"
   update_behavior                    = "AUTOMATIC"
-  category_id                        = var.category_ids["Applications (Managed by Terraform)"]
+  category_id                        = var.category_ids["applications"]
   site_id                            = "-1"
-  smart_group_id                     = var.computer_smart_group_model_ids["Laptops"]
+  smart_group_id                     = var.computer_smart_group_ids["all_managed"]
   install_predefined_config_profiles = true
   trigger_admin_notifications        = true
   notification_settings {

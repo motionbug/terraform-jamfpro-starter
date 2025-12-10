@@ -1,10 +1,14 @@
+# https://learn.jamf.com/en-US/bundle/jamf-pro-documentation-current/page/Smart_Groups.html
+
 locals {
   models = {
-    "Laptops" = {
+    "laptops" = {
+      name        = "Model - Laptops (Managed by Terraform)"
       search_type = "like"
       model       = "book"
     }
-    "Desktops" = {
+    "desktops" = {
+      name        = "Model - Desktops (Managed by Terraform)"
       search_type = "not like"
       model       = "book"
     }
@@ -13,7 +17,7 @@ locals {
 
 resource "jamfpro_smart_computer_group" "model" {
   for_each = local.models
-  name     = "Model - ${each.key}"
+  name     = each.value.name
   criteria {
     name        = "Model"
     priority    = 0

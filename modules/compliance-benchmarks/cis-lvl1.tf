@@ -1,3 +1,5 @@
+# https://learn.jamf.com/en-US/bundle/jamf-compliance-benchmarks-configuration-guide/page/Compliance_Benchmarks_Configuration_Guide.html
+
 data "jamfplatform_cbengine_rules" "cis_lvl1" {
   baseline_id = "cis_lvl1"
 }
@@ -18,6 +20,6 @@ resource "jamfplatform_cbengine_benchmark" "cis_lvl1_all" {
       enabled = r.enabled
     }
   ]
-  target_device_group = data.jamfpro_group.computer_smart_group_models["Desktops"].group_platform_id
+  target_device_group = data.jamfpro_group.computer_smart_groups["desktops"].group_platform_id
   enforcement_mode    = "MONITOR"
 }
