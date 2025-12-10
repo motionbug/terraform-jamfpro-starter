@@ -1,3 +1,7 @@
+data "jamfpro_package" "setup_manager_pkg" {
+  package_name = "Setup.Manager-1.4-629.pkg"
+}
+
 resource "jamfpro_computer_prestage_enrollment" "default" {
   display_name                            = "Default (Managed by Terraform)"
   mandatory                               = true
@@ -21,8 +25,8 @@ resource "jamfpro_computer_prestage_enrollment" "default" {
   auto_advance_setup                      = false
   install_profiles_during_setup           = false
   prestage_installed_profile_ids          = []
-  custom_package_ids                      = []
-  custom_package_distribution_point_id    = "-1"
+  custom_package_ids                      = [data.jamfpro_package.setup_manager_pkg.id]
+  custom_package_distribution_point_id    = "-2"
   enable_recovery_lock                    = false
   recovery_lock_password_type             = "MANUAL"
   recovery_lock_password                  = ""
@@ -54,6 +58,7 @@ resource "jamfpro_computer_prestage_enrollment" "default" {
     welcome                     = true
     wallpaper                   = true
     software_update             = true
+    os_showcase                 = true
     additional_privacy_settings = true
   }
   location_information {

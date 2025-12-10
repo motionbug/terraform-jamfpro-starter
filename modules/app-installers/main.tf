@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.10.6"
+  required_version = ">= 1.14.1"
   required_providers {
     jamfpro = {
       source  = "deploymenttheory/jamfpro"
-      version = "0.27.0"
+      version = "0.30.0"
     }
   }
 }

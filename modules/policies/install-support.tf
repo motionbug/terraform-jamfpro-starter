@@ -1,32 +1,23 @@
-terraform {
-  required_version = ">= 1.14.1"
-  required_providers {
-    jamfpro = {
-      source  = "deploymenttheory/jamfpro"
-      version = "0.30.0"
-    }
-  }
-}
 
-resource "jamfpro_smart_computer_group" "nudge_is_installed" {
-  name = "Nudge Is Installed (Managed by Terraform)"
+resource "jamfpro_smart_computer_group" "support_is_installed" {
+  name = "Support App Is Installed (Managed by Terraform)"
   criteria {
     name        = "Application Bundle ID"
     priority    = 0
     search_type = "is"
-    value       = "com.github.macadmins.Nudge"
+    value       = "nl.root3.support"
   }
   criteria {
     and_or      = "and"
     name        = "Application Version"
     priority    = 1
     search_type = "is"
-    value       = "2.0.12.81807"
+    value       = "3.0"
   }
 }
 
-resource "jamfpro_policy" "install_nudge" {
-  name            = "Install Nudge (Managed by Terraform)"
+resource "jamfpro_policy" "install_support" {
+  name            = "Install Support App (Managed by Terraform)"
   enabled         = true
   trigger_checkin = true
   frequency       = "Ongoing"
@@ -45,7 +36,7 @@ resource "jamfpro_policy" "install_nudge" {
     packages {
       distribution_point = "default"
       package {
-        id     = var.package_ids["nudge-essentials-2.0.12.81807.pkg"]
+        id     = var.package_ids["Support.3.0.pkg"]
         action = "Install"
       }
     }

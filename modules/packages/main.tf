@@ -1,16 +1,18 @@
 terraform {
-  required_version = ">= 1.10.6"
+  required_version = ">= 1.14.1"
   required_providers {
     jamfpro = {
       source  = "deploymenttheory/jamfpro"
-      version = "0.27.0"
+      version = "0.30.0"
     }
   }
 }
 
 locals {
   package_names = [
-    "nudge-essentials-2.0.12.81807.pkg"
+    "nudge-essentials-2.0.12.81807.pkg",
+    "Support.3.0.pkg",
+    "Setup.Manager-1.4-629.pkg"
   ]
 }
 
